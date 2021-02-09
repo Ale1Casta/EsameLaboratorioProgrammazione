@@ -110,7 +110,7 @@ def daily_stats(lista_dati):
 
     # controllo se ho una lista di liste
     for el in lista_dati:
-        if type(el) is not list and len(el) == 1:
+        if type(el) is not list or len(el) != 2:
             raise ExamException("Errore: elemento lista in input non è una lista di due elementi")
 
 
