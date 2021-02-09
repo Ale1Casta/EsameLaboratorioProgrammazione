@@ -181,9 +181,3 @@ def daily_stats(lista_dati):
         
 
 
-try:
-    time_series_file = CSVTimeSeriesFile(name='data.csv')
-    time_series = time_series_file.get_data()
-    print(daily_stats(time_series))
-except ExamException as t:
-    print(t)
