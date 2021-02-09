@@ -16,6 +16,9 @@ class CSVTimeSeriesFile:
 
         # lista vuota per salvare i valori
         values = []
+
+        if( type(self.name) is not str or self.name == None):
+            raise ExamException("Nome file non è una stringa")
         
 
         # Provo ad aprire il file per estrarne i dati. Se non ci riesco, avverto dell'errore, interrompo esecuzione
@@ -25,7 +28,7 @@ class CSVTimeSeriesFile:
 
         except:
             raise ExamException('Errore nella lettura del file')
-            return None # Esco dalla funzione
+            return None
 
 
         # leggo il file
@@ -71,7 +74,7 @@ class CSVTimeSeriesFile:
             raise ExamException("File in input è vuoto o tutti valori non utilizzabili")
         
 
-        # Controllo misurazioni siano ordine crescente
+        # Controllo date siano ordine crescente
         epo = []
         for i in values:
             epo.append(i[0])
@@ -83,6 +86,11 @@ class CSVTimeSeriesFile:
         except:
             raise ExamException("Le misurazioni non sono ordinate")
 
+        # controllo se ci sono date doppie
+        for i in range(1,len(values)):
+            if values[i][0] == ord[i-1]:
+                raise ExamException("Sono presenti epoch duplicati")
+
 
         
         my_file.close()
@@ -90,9 +98,12 @@ class CSVTimeSeriesFile:
 
         
 
-#-____________________________________________________________-
+#______________________________________________________________
 #--------------------------------------------------------------
 #______________________________________________________________
+
+
+
 
 #data lista in input creo un altra lista con min, max, media di ogni giorno
 def daily_stats(lista_dati):
@@ -100,7 +111,8 @@ def daily_stats(lista_dati):
     i = 0
     j = 0
     giorni = [] #lista con valore inizio tutti i giorni del mese
-    risult = []
+    risultato = []
+
 
     #controllo lista in input sia effettivamente una lista
     try:
@@ -114,6 +126,8 @@ def daily_stats(lista_dati):
             raise ExamException("Errore: elemento lista in input non è una lista di due elementi")
 
 
+
+
     # creo lista con giorni di origine della misurazione
     for n in range(len(lista_dati)):
         day_start_epoch = lista_dati[n][0] - (lista_dati[n][0] % 86400)
@@ -121,12 +135,12 @@ def daily_stats(lista_dati):
         
 
 
-    '''#controllo se giorni è ordinato
+    #controllo se giorni è ordinato
     ord = sorted(giorni)
     try: 
         giorni == ord 
     except:
-        raise ExamException("Le misurazioni non sono ordinate")'''
+        raise ExamException("Le misurazioni non sono ordinate")
 
     #tolgo doppioni e riordino giorni
     giorni = list(sorted(set(giorni)))
@@ -159,11 +173,11 @@ def daily_stats(lista_dati):
         mini = min(temp_g)
         media = sum(temp_g)/ len(temp_g)
 
-        risult.append([mini, mas, media])
+        risultato.append([mini, mas, media])
         i+=1
 
 
-    return risult 
+    return risultato 
         
 
 
