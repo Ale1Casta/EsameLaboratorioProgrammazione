@@ -18,7 +18,7 @@ class CSVTimeSeriesFile:
         values = []
         
 
-        # Provo ad aprire il file per estrarne i dati. Se non ci riesco, avverto dell'errore, interrmompo esecuzione
+        # Provo ad aprire il file per estrarne i dati. Se non ci riesco, avverto dell'errore, interrompo esecuzione
 
         try: 
             my_file = open(self.name, 'r')
@@ -36,7 +36,9 @@ class CSVTimeSeriesFile:
                 elements = line.split(',')
                 assert(len(elements) == 2)
             except:
-                 print("La lista non è di due elementi: ", line)
+                 continue
+                
+                
 
             # Non processo l'intestazione
             if elements[0] != 'epoch':
@@ -44,9 +46,9 @@ class CSVTimeSeriesFile:
                 # Setto la data ed il valore
                 epoch  = elements[0]
                 temperature = elements[1]
-                
-                # converto "epoch" in int se non riesco devo fare in modo che si salti il valore silenziosamente (errore recoverable)
-                # converto "temperature"
+
+
+                # converto "epoch" in int e "temperature" in float se non riesco devo fare in modo che si salti il valore silenziosamente (errore recoverable)
                 
                 try:
                     epoch = int(epoch)
@@ -58,18 +60,18 @@ class CSVTimeSeriesFile:
                 
                 
                 
-                # Infine aggiungo alla lista dei valori questo valore
+                # Aggiungo alla lista dei valori questo valore
                 subList = (epoch, temperature)
                 values.append(list(subList))
 
 
-        # Controllo se lista finale è vuota, nel caso avrò file vuoto o valori no nconvertibili secondo esigenza
-        
+        # Controllo se lista finale è vuota, nel caso avrò file vuoto o valori non convertibili secondo esigenza
+    
         if values == []:
-            raise ExamException("File in imput è vuoto o contiene valori non utilizzabili")
+            raise ExamException("File in input è vuoto o tutti valori non utilizzabili")
         
 
-        # Controllo misurazioni ordine crescente
+        # Controllo misurazioni siano ordine crescente
         epo = []
         for i in values:
             epo.append(i[0])
@@ -83,31 +85,36 @@ class CSVTimeSeriesFile:
 
 
         
-
-    
         my_file.close()
         return values
 
-
+        
 
 #-____________________________________________________________-
 #--------------------------------------------------------------
 #______________________________________________________________
 
-
+#data lista in input creo un altra lista con min, max, media di ogni giorno
 def daily_stats(lista_dati):
     
     i = 0
     j = 0
-
-    # creo lista con valore inizio tutti i giorni del mese
-    giorni = []
-
-   
-
-    # lista con min, max, media di ogni giorno
+    giorni = [] #lista con valore inizio tutti i giorni del mese
     risult = []
 
+    #controllo lista in input sia effettivamente una lista
+    try:
+        assert(type(lista_dati) is list)
+    except:
+        raise ExamException("Errore: non hai dato una lista in input")
+
+    # controllo se ho una lista di liste
+    for el in lista_dati:
+        if type(el) is not list and len(el) == 1:
+            raise ExamException("Errore: elemento lista in input non è una lista di due elementi")
+
+
+    # creo lista con giorni di origine della misurazione
     for n in range(len(lista_dati)):
         day_start_epoch = lista_dati[n][0] - (lista_dati[n][0] % 86400)
         giorni.append(day_start_epoch)
@@ -132,9 +139,9 @@ def daily_stats(lista_dati):
         raise ExamException("Mese non completo, dati mancanti")'''
 
 
-    #--------------------------------------------------------------------------
+    #--------------------------------------------------------------------
     #creo lista con valori temp giorno per giorno e ne calcolo min, max, media
-    #--------------------------------------------------------------------------
+    #--------------------------------------------------------------------
 
     while i < len(giorni):
 
@@ -158,8 +165,6 @@ def daily_stats(lista_dati):
 
     return risult 
         
-
-
 
 
 try:
